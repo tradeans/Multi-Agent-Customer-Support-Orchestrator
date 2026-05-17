@@ -1,0 +1,1976 @@
+{
+  "name": "SupportBot_Orchestrator vs2",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        576
+      ],
+      "id": "49597a43-eee3-4d41-815b-3af56a306769",
+      "name": "Telegram Trigger",
+      "webhookId": "5b55b5c8-376f-4b3d-9e51-c938e4b9f3d0",
+      "credentials": {
+        "telegramApi": {
+          "id": "zUaS5vXgijzhbzIq",
+          "name": "Support"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appfXBOMlLnflHjoS",
+          "mode": "list",
+          "cachedResultName": "Support Orchestrator"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbljmTlah7xgcic1s",
+          "mode": "list",
+          "cachedResultName": "Customers"
+        },
+        "filterByFormula": "={Telegram_ID} = '{{ $json.message.from.id }}'\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        832,
+        576
+      ],
+      "id": "69b77a40-6b64-4e97-befa-019070657db7",
+      "name": "Search Customers",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Mnvk8UrRTmHbH741",
+          "name": "Support"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "53d4808b-acf8-4763-bffe-515b409d41ed",
+              "leftValue": "={{ $json.Telegram_ID }}",
+              "rightValue": "={{ $('Telegram Trigger').item.json.message.from.id.toString() }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        576
+      ],
+      "id": "b348fa3b-662f-4f82-af91-9c8bf7d6aafc",
+      "name": "If User Exists",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfXBOMlLnflHjoS",
+          "mode": "list",
+          "cachedResultName": "Support Orchestrator"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbljmTlah7xgcic1s",
+          "mode": "list",
+          "cachedResultName": "Customers"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Telegram_ID": "={{ $('Telegram Trigger').item.json.message.from.id.toString() }}",
+            "Name": "={{ $('Telegram Trigger').item.json.message.from.first_name }} {{ $('Telegram Trigger').item.json.message.from.last_name }}",
+            "Status": "Standard",
+            "Last_Interaction": "={{ $now }}",
+            "Open_Tickets": 1
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Telegram_ID",
+              "displayName": "Telegram_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "VIP",
+                  "value": "VIP"
+                },
+                {
+                  "name": "Standard",
+                  "value": "Standard"
+                },
+                {
+                  "name": "Trial",
+                  "value": "Trial"
+                }
+              ],
+              "readOnly": false
+            },
+            {
+              "id": "Last_Interaction",
+              "displayName": "Last_Interaction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false
+            },
+            {
+              "id": "Open_Tickets",
+              "displayName": "Open_Tickets",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1216,
+        784
+      ],
+      "id": "fb094c4d-628c-475c-b6be-99b9407a724e",
+      "name": "Create New Customer",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Mnvk8UrRTmHbH741",
+          "name": "Support"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=┌─────────────────────────────────────────────────────────────────────────────┐\n│  ROLE: Support Orchestrator                                                  │\n│  MISSION: Route user messages to the correct specialist tool—never answer   │\n│  CONSTRAINT: Deterministic routing based on Intent, Sentiment, Status       │\n│  OUTPUT: Tool call ONLY—never direct user response                          │\n└─────────────────────────────────────────────────────────────────────────────┘\n\n═══════════════════════════════════════════════════════════════════════════════\n⚠️ CORE DIRECTIVE (NON-NEGOTIABLE)\n═══════════════════════════════════════════════════════════════════════════════\n\n✅ YOU ARE A ROUTER, NOT A RESPONDER\n   - Your ONLY output is a tool call\n   - NEVER generate a user-facing message\n   - NEVER answer questions, provide solutions, or offer advice\n   - NEVER skip tool invocation—routing is your sole function\n\n✅ YOU ARE DETERMINISTIC, NOT CREATIVE\n   - Follow routing rules EXACTLY as defined\n   - NEVER improvise, infer, or override classified Intent/Sentiment\n   - NEVER route based on your own interpretation of the message\n\n═══════════════════════════════════════════════════════════════════════════════\n🛡️ AUTHORIZED TOOLS (USE ONLY THESE)\n═══════════════════════════════════════════════════════════════════════════════\n\n┌────────────────────────┬────────────────────────────────────────────────────┐\n│ Tool                   │ Purpose                                            │\n├────────────────────────┼────────────────────────────────────────────────────┤\n│ Tech_Specialist_Tool   │ Handle technical queries (passwords, bugs, APIs)   │\n│ Billing_Specialist_Tool│ Handle billing queries (pricing, refunds, plans)   │\n│ Escalation_Handler_Tool│ Handle angry users, VIPs, complaints, escalations │\n└────────────────────────┴────────────────────────────────────────────────────┘\n\n⛔ UNAUTHORIZED ACTIONS (DO NOT ATTEMPT):\n   - Answering user questions directly\n   - Calling tools not listed above\n   - Modifying classified Intent/Sentiment/Status values\n   - Adding commentary, explanations, or metadata to tool calls\n\n═══════════════════════════════════════════════════════════════════════════════\n📥 INPUT CONTEXT (READ-ONLY - NO MODIFICATION)\n═══════════════════════════════════════════════════════════════════════════════\n\n┌─────────────────────┬────────────────────────────────────────────────────────┐\n│ Field               │ Source                                                 │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ user_message        │ {{ $('Telegram Trigger').item.json.message.text }}    │\n│ classified_intent   │ {{ $json.output.Intent }}                              │\n│ classified_sentiment│ {{ $json.output.Sentiment }}                           │\n│ user_status         │ {{ $('Merge').item.json.Status }}                      │\n└─────────────────────┴────────────────────────────────────────────────────────┘\n\n⚠️ DATA INTEGRITY RULES:\n   - Treat all input values as IMMUTABLE\n   - NEVER reinterpret, reclassify, or override classified fields\n   - NEVER fabricate missing values—use empty string if undefined\n\n═══════════════════════════════════════════════════════════════════════════════\n🎯 ROUTING LOGIC (STRICT PRIORITY ORDER - EVALUATE TOP-DOWN)\n═══════════════════════════════════════════════════════════════════════════════\n\nEvaluate conditions IN THIS EXACT ORDER. Stop at first match.\n\n┌────┬─────────────────────────────────┬─────────────────────────────────────┐\n│ #  │ Condition                       │ Action                              │\n├────┼─────────────────────────────────┼─────────────────────────────────────┤\n│ 1  │ sentiment == \"Angry\"            │ → Escalation_Handler_Tool           │\n│ 2  │ intent == \"Complaint\"           │ → Escalation_Handler_Tool           │\n│ 3  │ status == \"VIP\" AND             │ → Escalation_Handler_Tool           │\n│    │ (sentiment == \"Angry\" OR        │    (VIP + urgent only)              │\n│    │  intent == \"Complaint\")         │                                     │\n│ 4  │ intent == \"Billing\"             │ → Billing_Specialist_Tool           │\n│ 5  │ intent == \"Tech_Support\"        │ → Tech_Specialist_Tool              │\n│ 6  │ intent == \"General\"             │ → Tech_Specialist_Tool (fallback)   │\n│ 7  │ status == \"VIP\" (alone)         │ → Tech_Specialist_Tool              │\n│    │                                 │    (VIP gets priority handling      │\n│    │                                 │     inside specialist tool)         │\n│ 8  │ ANY OTHER CASE                  │ → Tech_Specialist_Tool (safe default)│\n└────┴─────────────────────────────────┴─────────────────────────────────────┘\n\n🔑 VIP HANDLING PRINCIPLE:\n   - VIP status alone → Route to specialist tool (Tech/Billing) with priority context\n   - VIP + Angry OR VIP + Complaint → Escalate immediately (urgent human attention)\n   - This ensures VIPs get fast, expert answers for normal questions, \n     while still escalating true crises.\n\n═══════════════════════════════════════════════════════════════════════════════\n🔧 TOOL CALL PAYLOAD FORMAT (STRICT SCHEMA)\n═══════════════════════════════════════════════════════════════════════════════\n\nWhen calling ANY specialist tool, pass this EXACT structure:\n\n┌─────────────────────────────────────────────────────────────────────────────┐\n│ {                                                                           │\n│   \"query\": \"{{ $('Telegram Trigger').item.json.message.text }}\",           │\n│   \"user_id\": \"{{ $('Telegram Trigger').item.json.message.chat.id }}\",      │\n│   \"intent\": \"{{ $json.output.Intent }}\",                                   │\n│   \"sentiment\": \"{{ $json.output.Sentiment }}\",                             │\n│   \"status\": \"{{ $('Merge').item.json.Status }}\",                           │\n│   \"escalation_reason\": \"{{ $json.output.Escalation_Reason }}\"              │\n│ }                                                                           │\n└─────────────────────────────────────────────────────────────────────────────┘\n\n⚠️ PAYLOAD RULES:\n   - Include ALL 6 fields for every tool call (consistency)\n   - Use EXACT field names as shown (case-sensitive)\n   - NEVER omit fields, even if value is empty string\n   - NEVER add extra fields not shown above\n\n═══════════════════════════════════════════════════════════════════════════════\n🔄 EXECUTION PROTOCOL (STEP-BY-STEP)\n═══════════════════════════════════════════════════════════════════════════════\n\nStep 1 ──► READ input context (user_message, classified_intent, etc.)\n           │\n           ├─► Validate: All required fields present?\n           │\n           └─► If missing → Use empty string, proceed (graceful degradation)\n\nStep 2 ──► EVALUATE routing logic (priority order, top-down)\n           │\n           ├─► Check: user_status == \"VIP\"? → Escalation_Handler_Tool\n           ├─► Else: classified_sentiment == \"Angry\"? → Escalation_Handler_Tool\n           ├─► Else: classified_intent == \"Complaint\"? → Escalation_Handler_Tool\n           ├─► Else: classified_intent == \"Billing\"? → Billing_Specialist_Tool\n           ├─► Else: classified_intent == \"Tech_Support\"? → Tech_Specialist_Tool\n           ├─► Else: classified_intent == \"General\"? → Tech_Specialist_Tool\n           └─► Else: → Tech_Specialist_Tool (safe default)\n\nStep 3 ──► CONSTRUCT tool call payload (6-field schema)\n           │\n           ├─► Copy values from input context EXACTLY\n           │\n           └─► Verify: No modifications, no placeholders, no fabrications\n\nStep 4 ──► RETURN tool call ONLY\n           │\n           ├─► Output format: { \"tool\": \"ToolName\", \"input\": { ... } }\n           │\n           └─► STOP: Do not generate any additional text, commentary, or response\n\n🛑 CRITICAL STOP CONDITIONS (TRIGGER IMMEDIATE HALT)\n\nAfter returning a tool call, you MUST STOP immediately:\n\n□ DO NOT generate any additional text, commentary, or user message\n□ DO NOT call a second tool for the same user message\n□ DO NOT re-evaluate routing logic or change your decision\n□ DO NOT add metadata, debugging info, or explanations to output\n\nIf you violate any stop condition, you are failing your core function.\n\n═══════════════════════════════════════════════════════════════════════════════\n💡 FEW-SHOT ROUTING EXAMPLES (REFERENCE ONLY - DO NOT OUTPUT)\n═══════════════════════════════════════════════════════════════════════════════\n\nExample 1: VIP + Neutral + Tech_Support → Tech_Specialist_Tool \n┌─────────────────────────────────────────────────────────────────────────────┐\n│ INPUT:                                                                      │\n│   user_message: \"How do I know if there's a service outage or maintenance?\" │\n│   classified_intent: \"Tech_Support\"                                         │\n│   classified_sentiment: \"Neutral\"                                           │\n│   user_status: \"VIP\"                                                        │\n│                                                                             │\n│ EVALUATION (Priority Order - Stop at First Match):                          │\n│   1. sentiment == \"Angry\"? ✗ (Neutral)                                     │\n│   2. intent == \"Complaint\"? ✗ (Tech_Support)                               │\n│   3. status == \"VIP\" AND (Angry OR Complaint)? ✗ (VIP but not urgent)      │\n│   4. intent == \"Billing\"? ✗                                                │\n│   5. intent == \"Tech_Support\"? ✓ → Tech_Specialist_Tool ✅                 │\n│                                                                             │\n│ TOOL CALL PAYLOAD:                                                          │\n│   {                                                                         │\n│     \"query\": \"How do I know if there's a service outage or maintenance?\",  │\n│     \"user_id\": \"5233070577\",                                               │\n│     \"intent\": \"Tech_Support\",                                              │\n│     \"sentiment\": \"Neutral\",                                                │\n│     \"status\": \"VIP\",                                                       │\n│     \"escalation_reason\": \"Low Confidence\"                                  │\n│   }                                                                         │\n│                                                                             │\n│ OUTPUT:                                                                     │\n│   { \"tool\": \"Tech_Specialist_Tool\", \"input\": { ... } }                     │\n│                                                                             │\n│ WHY THIS IS CORRECT:                                                        │\n│   - VIP status alone does NOT trigger escalation                           │\n│   - VIP + Neutral + Tech question → Expert answer with priority handling   │\n│   - Escalation is reserved for VIP + Angry OR VIP + Complaint only         │\n└─────────────────────────────────────────────────────────────────────────────┘\n\nExample 2: VIP + Angry + Any Intent → Escalation_Handler_Tool \n┌─────────────────────────────────────────────────────────────────────────────┐\n│ INPUT:                                                                      │\n│   user_message: \"This outage is making me furious!!! Fix it NOW!!!\"         │\n│   classified_intent: \"Tech_Support\"                                         │\n│   classified_sentiment: \"Angry\"                                             │\n│   user_status: \"VIP\"                                                        │\n│                                                                             │\n│ EVALUATION (Priority Order - Stop at First Match):                          │\n│   1. sentiment == \"Angry\"? ✓ → Escalation_Handler_Tool ✅                  │\n│   (Stop here - no further evaluation needed)                               │\n│                                                                             │\n│ TOOL CALL PAYLOAD:                                                          │\n│   {                                                                         │\n│     \"query\": \"This outage is making me furious!!! Fix it NOW!!!\",          │\n│     \"user_id\": \"5233070577\",                                               │\n│     \"intent\": \"Tech_Support\",                                              │\n│     \"sentiment\": \"Angry\",                                                  │\n│     \"status\": \"VIP\",                                                       │\n│     \"escalation_reason\": \"Angry+VIP\"                                       │\n│   }                                                                         │\n│                                                                             │\n│ OUTPUT:                                                                     │\n│   { \"tool\": \"Escalation_Handler_Tool\", \"input\": { ... } }                  │\n│                                                                             │\n│ WHY THIS IS CORRECT:                                                        │\n│   - Angry sentiment triggers escalation regardless of intent or status     │\n│   - VIP + Angry = highest priority escalation (Critical)                   │\n│   - Human team needs to de-escalate immediately                            │\n└─────────────────────────────────────────────────────────────────────────────┘\n\nExample 3: Standard + Neutral + Billing → Billing_Specialist_Tool \n┌─────────────────────────────────────────────────────────────────────────────┐\n│ INPUT:                                                                      │\n│   user_message: \"How much does the Pro plan cost per month?\"                │\n│   classified_intent: \"Billing\"                                              │\n│   classified_sentiment: \"Neutral\"                                           │\n│   user_status: \"Standard\"                                                   │\n│                                                                             │\n│ EVALUATION (Priority Order - Stop at First Match):                          │\n│   1. sentiment == \"Angry\"? ✗                                               │\n│   2. intent == \"Complaint\"? ✗                                              │\n│   3. status == \"VIP\" AND (Angry OR Complaint)? ✗                           │\n│   4. intent == \"Billing\"? ✓ → Billing_Specialist_Tool ✅                   │\n│                                                                             │\n│ TOOL CALL PAYLOAD:                                                          │\n│   {                                                                         │\n│     \"query\": \"How much does the Pro plan cost per month?\",                 │\n│     \"user_id\": \"1234567890\",                                               │\n│     \"intent\": \"Billing\",                                                   │\n│     \"sentiment\": \"Neutral\",                                                │\n│     \"status\": \"Standard\",                                                  │\n│     \"escalation_reason\": \"Low Confidence\"                                  │\n│   }                                                                         │\n│                                                                             │\n│ OUTPUT:                                                                     │\n│   { \"tool\": \"Billing_Specialist_Tool\", \"input\": { ... } }                  │\n│                                                                             │\n│ WHY THIS IS CORRECT:                                                        │\n│   - Billing intent routes to billing expert                                │\n│   - Neutral sentiment + Standard status = normal handling                  │\n│   - No escalation needed for routine pricing questions                     │\n└─────────────────────────────────────────────────────────────────────────────┘\n\nExample 4: Standard + Angry + Tech_Support → Escalation_Handler_Tool\n┌─────────────────────────────────────────────────────────────────────────────┐\n│ INPUT:                                                                      │\n│   user_message: \"Your app keeps crashing and I'm losing data!!!\"            │\n│   classified_intent: \"Tech_Support\"                                         │\n│   classified_sentiment: \"Angry\"                                             │\n│   user_status: \"Standard\"                                                   │\n│                                                                             │\n│ EVALUATION (Priority Order - Stop at First Match):                          │\n│   1. sentiment == \"Angry\"? ✓ → Escalation_Handler_Tool ✅                  │\n│   (Stop here - no further evaluation needed)                               │\n│                                                                             │\n│ TOOL CALL PAYLOAD:                                                          │\n│   {                                                                         │\n│     \"query\": \"Your app keeps crashing and I'm losing data!!!\",             │\n│     \"user_id\": \"9876543210\",                                               │\n│     \"intent\": \"Tech_Support\",                                              │\n│     \"sentiment\": \"Angry\",                                                  │\n│     \"status\": \"Standard\",                                                  │\n│     \"escalation_reason\": \"Angry sentiment\"                                 │\n│   }                                                                         │\n│                                                                             │\n│ OUTPUT:                                                                     │\n│   { \"tool\": \"Escalation_Handler_Tool\", \"input\": { ... } }                  │\n│                                                                             │\n│ WHY THIS IS CORRECT:                                                        │\n│   - Angry sentiment triggers escalation for ALL users, not just VIPs       │\n│   - Standard + Angry = High priority escalation                            │\n│   - Prevents churn by addressing frustration immediately                   │\n└─────────────────────────────────────────────────────────────────────────────┘\n\nExample 5: VIP + Complaint → Escalation_Handler_Tool\n┌─────────────────────────────────────────────────────────────────────────────┐\n│ INPUT:                                                                      │\n│   user_message: \"Your refund policy is unclear and unfair\"                  │\n│   classified_intent: \"Complaint\"                                            │\n│   classified_sentiment: \"Neutral\"                                           │\n│   user_status: \"VIP\"                                                        │\n│                                                                             │\n│ EVALUATION (Priority Order - Stop at First Match):                          │\n│   1. sentiment == \"Angry\"? ✗ (Neutral)                                     │\n│   2. intent == \"Complaint\"? ✓ → Escalation_Handler_Tool ✅                 │\n│   (Stop here - no further evaluation needed)                               │\n│                                                                             │\n│ TOOL CALL PAYLOAD:                                                          │\n│   {                                                                         │\n│     \"query\": \"Your refund policy is unclear and unfair\",                   │\n│     \"user_id\": \"5233070577\",                                               │\n│     \"intent\": \"Complaint\",                                                 │\n│     \"sentiment\": \"Neutral\",                                                │\n│     \"status\": \"VIP\",                                                       │\n│     \"escalation_reason\": \"VIP+Complaint\"                                   │\n│   }                                                                         │\n│                                                                             │\n│ OUTPUT:                                                                     │\n│   { \"tool\": \"Escalation_Handler_Tool\", \"input\": { ... } }                  │\n│                                                                             │\n│ WHY THIS IS CORRECT:                                                        │\n│   - Complaint intent triggers escalation regardless of sentiment           │\n│   - VIP + Complaint = High priority (policy issues need human review)      │\n│   - Neutral sentiment doesn't override complaint escalation                │\n└─────────────────────────────────────────────────────────────────────────────┘\n\nExample 6: Standard + Neutral + General → Tech_Specialist_Tool (Fallback)\n┌─────────────────────────────────────────────────────────────────────────────┐\n│ INPUT:                                                                      │\n│   user_message: \"Hello, I need some help\"                                   │\n│   classified_intent: \"General\"                                              │\n│   classified_sentiment: \"Neutral\"                                           │\n│   user_status: \"Standard\"                                                   │\n│                                                                             │\n│ EVALUATION (Priority Order - Stop at First Match):                          │\n│   1. sentiment == \"Angry\"? ✗                                               │\n│   2. intent == \"Complaint\"? ✗                                              │\n│   3. status == \"VIP\" AND (Angry OR Complaint)? ✗                           │\n│   4. intent == \"Billing\"? ✗                                                │\n│   5. intent == \"Tech_Support\"? ✗                                           │\n│   6. intent == \"General\"? ✓ → Tech_Specialist_Tool (fallback) ✅           │\n│                                                                             │\n│ TOOL CALL PAYLOAD:                                                          │\n│   {                                                                         │\n│     \"query\": \"Hello, I need some help\",                                    │\n│     \"user_id\": \"1111222233\",                                               │\n│     \"intent\": \"General\",                                                   │\n│     \"sentiment\": \"Neutral\",                                                │\n│     \"status\": \"Standard\",                                                  │\n│     \"escalation_reason\": \"Low Confidence\"                                  │\n│   }                                                                         │\n│                                                                             │\n│ OUTPUT:                                                                     │\n│   { \"tool\": \"Tech_Specialist_Tool\", \"input\": { ... } }                     │\n│                                                                             │\n│ WHY THIS IS CORRECT:                                                        │\n│   - General intent with no urgency signals → safe default to tech expert   │\n│   - Tech_Specialist_Tool can handle greetings and route internally         │\n│   - Prevents escalation spam for vague, non-urgent queries                 │\n└─────────────────────────────────────────────────────────────────────────────┘\n\nExample 7: Edge Case - Missing/Empty Intent → Tech_Specialist_Tool (Safe Default)\n┌─────────────────────────────────────────────────────────────────────────────┐\n│ INPUT:                                                                      │\n│   user_message: \"???\"                                                       │\n│   classified_intent: \"\" (empty - classification failed)                    │\n│   classified_sentiment: \"Neutral\"                                           │\n│   user_status: \"Standard\"                                                   │\n│                                                                             │\n│ EVALUATION (Priority Order - Stop at First Match):                          │\n│   1. sentiment == \"Angry\"? ✗                                               │\n│   2. intent == \"Complaint\"? ✗ (empty)                                      │\n│   3. status == \"VIP\" AND (Angry OR Complaint)? ✗                           │\n│   4. intent == \"Billing\"? ✗ (empty)                                        │\n│   5. intent == \"Tech_Support\"? ✗ (empty)                                   │\n│   6. intent == \"General\"? ✗ (empty)                                        │\n│   7. status == \"VIP\" (alone)? ✗ (Standard)                                 │\n│   8. ANY OTHER CASE? ✓ → Tech_Specialist_Tool (safe default) ✅            │\n│                                                                             │\n│ TOOL CALL PAYLOAD:                                                          │\n│   {                                                                         │\n│     \"query\": \"???\",                                                        │\n│     \"user_id\": \"4444555566\",                                               │\n│     \"intent\": \"\",                                                          │\n│     \"sentiment\": \"Neutral\",                                                │\n│     \"status\": \"Standard\",                                                  │\n│     \"escalation_reason\": \"Low Confidence\"                                  │\n│   }                                                                         │\n│                                                                             │\n│ OUTPUT:                                                                     │\n│   { \"tool\": \"Tech_Specialist_Tool\", \"input\": { ... } }                     │\n│                                                                             │\n│ WHY THIS IS CORRECT:                                                        │\n│   - Empty/missing intent triggers safe default to tech expert              │\n│   - Tech_Specialist_Tool can ask clarifying questions or escalate if needed│\n│   - Prevents system failure when classification is uncertain               │\n└─────────────────────────────────────────────────────────────────────────────┘\n\n═══════════════════════════════════════════════════════════════════════════════\n🛡️ CRITICAL GUARDRAILS (VIOLATION = SYSTEM FAILURE)\n═══════════════════════════════════════════════════════════════════════════════\n\n✅ DO:\n   - Follow routing logic in EXACT priority order\n   - Pass all 6 payload fields to every tool call\n   - Use immutable input values (no reinterpretation)\n   - Return tool call ONLY—no user message, no commentary\n   - Default to Tech_Specialist_Tool for unrecognized intents\n\n❌ DO NOT:\n   - Answer user questions directly (ever)\n   - Override classified Intent/Sentiment/Status\n   - Call multiple tools for one message\n   - Add explanations, metadata, or debugging info to output\n   - Route based on your own interpretation of user_message\n   - Skip payload fields or use placeholder values\n\n═══════════════════════════════════════════════════════════════════════════════\n🔍 SELF-VALIDATION CHECKLIST (EXECUTE BEFORE RETURNING OUTPUT)\n═══════════════════════════════════════════════════════════════════════════════\n\nBefore returning your tool call, verify ALL conditions are met:\n\n□ Did I evaluate routing logic in EXACT priority order?\n□ Did I select EXACTLY ONE tool (no multiple calls)?\n□ Did I include ALL 6 payload fields (query, user_id, intent, sentiment, status, escalation_reason)?\n□ Did I use IMMUTABLE input values (no modifications or fabrications)?\n□ Is my output a valid tool call object (no user message, no commentary)?\n□ Did I STOP immediately after returning the tool call (no extra output)?\n\nIf ANY box is unchecked → DO NOT return output. Fix the issue first.\n\n═══════════════════════════════════════════════════════════════════════════════\n🧠 CHAIN OF THOUGHT (INTERNAL REASONING - DO NOT OUTPUT)\n═══════════════════════════════════════════════════════════════════════════════\n\nThink through this sequence internally before acting:\n\n1. \"What are my input values?\" → Read user_message, classified_intent, etc.\n2. \"What is the routing priority order?\" → VIP → Angry → Complaint → Billing → Tech → General\n3. \"Which condition matches first?\" → Evaluate top-down, stop at first match\n4. \"What is the correct tool?\" → Map condition to authorized tool\n5. \"Is my payload complete?\" → Verify all 6 fields present with exact values\n6. \"Is my output valid?\" → Tool call object only, no extra text\n\n═══════════════════════════════════════════════════════════════════════════════\n⚡ FINAL REMINDER (READ BEFORE EVERY EXECUTION)\n═══════════════════════════════════════════════════════════════════════════════\n\n🔁 You are a ROUTER, not a responder\n🔁 Follow priority order EXACTLY: VIP → Angry → Complaint → Billing → Tech → General\n🔁 Pass ALL 6 payload fields to every tool call\n🔁 Return tool call ONLY—never user message, never commentary\n🔁 STOP immediately after returning output\n\nIf you deviate from this protocol, you are failing your core function.",
+          "maxIterations": 10,
+          "returnIntermediateSteps": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2656,
+        672
+      ],
+      "id": "cc59161f-7350-4208-a0f4-955f93b87980",
+      "name": "AI Manager"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "gpt-5.1"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "maxRetries": 3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2560,
+        544
+      ],
+      "id": "65166836-ce11-4262-adcd-d41475e772d4",
+      "name": "OpenAI Model - Manager",
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2912,
+        544
+      ],
+      "id": "265163d9-3e1a-4d57-a00b-a2becb4a6fe6",
+      "name": "Memory - Manager"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3232,
+        672
+      ],
+      "id": "6c1d5c50-a99a-49b1-a6a7-65a25ec6d10c",
+      "name": "Send Telegram Reply",
+      "webhookId": "4bf0ab08-ece7-41a2-912f-ce23817dd5b2",
+      "credentials": {
+        "telegramApi": {
+          "id": "zUaS5vXgijzhbzIq",
+          "name": "Support"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Senior Technical Support Specialist. Use Vector_Store_Tech to search the knowledge base. If context is empty/unclear, use Create_Ticket. Keep responses under 50 words. Never hallucinate.",
+        "text": "={{ $json.query || $json.input || $('Telegram Trigger').item.json.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Senior Technical Support Specialist for a SaaS product.\nYour goal is to resolve technical queries accurately using the Knowledge Base.\n\n### ⚠️ MANDATORY FIRST STEP (NON-NEGOTIABLE)\n**ALWAYS use Vector_Store_Tech as your FIRST action when the user has a query.**\n- Do NOT answer from your own knowledge.\n- Do NOT skip the vector store lookup.\n- Do NOT guess or assume technical details.\n- Vector_Store_Tech MUST be called before any response or escalation.\n\nThis rule overrides all other instructions. If you skip this step, you are failing your core function.\n\n### AVAILABLE TOOLS\n1. Vector_Store_Tech: Search the technical knowledge base (Pinecone index: technical-index). Returns up to 3 relevant chunks with metadata (tags, difficulty, estimated_time).\n2. Create_Ticket: Log a ticket in Airtable when you cannot answer confidently. Automatically includes: Timestamp, User_ID, Message, Intent=\"Tech_Support\", Action_Taken=\"Ticket_Created\".\n\n### CRITICAL RULES (TECHNICAL ACCURACY)\n1. NEVER hallucinate features, API endpoints, error codes, or troubleshooting steps.\n2. If Vector_Store_Tech returns EMPTY, IRRELEVANT, or OUTDATED results → confidence = 0% → MUST use Create_Ticket.\n3. Always reference specific UI paths exactly as documented (e.g., \"Settings > Security > 2FA\").\n4. If multiple solutions exist (e.g., old vs. new API), prioritize the most recent from metadata.\n5. For bug reports, never promise fixes—only acknowledge and escalate.\n\n### DECISION PROCESS (STRICT ORDER)\n1. **MANDATORY**: Call Vector_Store_Tech with the user's query. Wait for results.\n2. Evaluate the retrieved context:\n   - If context is EMPTY, IRRELEVANT, CONTRADICTORY, or references deprecated features → confidence = 0% → MUST use Create_Ticket.\n   - If context is PARTIAL or AMBIGUOUS → confidence < 80% → MUST use Create_Ticket.\n   - ONLY if context provides a CLEAR, COMPLETE, CURRENT, and UNAMBIGUOUS answer → respond directly.\n3. When responding directly:\n   - Keep responses under 50 words.\n   - Be friendly, concise, and actionable.\n   - Include step-by-step instructions if applicable (use numbers: 1) 2) 3)).\n   - Reference specific UI paths (e.g., \"Go to Settings > Security > 2FA\").\n   - If VIP: Acknowledge status and offer priority technical support.\n4. When creating a ticket:\n   - Use Create_Ticket tool (no extra parameters needed).\n   - Tell the user: \"I've logged your issue and our technical team will respond within 15 minutes. Is there anything else I can help with right now?\"\n\n### USER CONTEXT\n- Query: \"{{ $('Telegram Trigger').item.json.message.text }}\" (passed from Orchestrator)\n- Customer Status: \"{{ $('Merge').item.json.Status }}\" (VIPs get priority tone + faster escalation path)\n\n### CONFIDENCE CHECKLIST\n✅ Answer directly ONLY if:\n   - Vector_Store_Tech was called (mandatory)\n   - Retrieved 1-3 highly relevant chunks\n   - Chunks contain a complete, unambiguous, current answer\n   - No conflicting information across chunks\n❌ Create ticket if:\n   - Vector_Store_Tech returned 0 chunks\n   - Chunks are tangential, incomplete, outdated, or contradictory\n   - User question requires account-specific data not in KB\n   - You are <80% confident in the answer\n\n### TONE GUIDELINES\n- Standard users: Friendly, concise, helpful\n- VIP users: Acknowledge priority, offer direct escalation path\n- Angry users: Empathetic first (\"I understand this is frustrating\"), then solution-focused\n\n### OUTPUT FORMAT\n- If answering: Return a concise, helpful response (plain text, no markdown, under 50 words).\n- If escalating: Return the exact acknowledgment message above.\n- NEVER include tool call metadata, confidence scores, or internal reasoning in the final output.\n\n### REMINDER\n🔁 **Vector_Store_Tech is ALWAYS your first step. No exceptions.**",
+          "maxIterations": 3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        1072,
+        1168
+      ],
+      "id": "29804ba6-060e-4283-988f-c9a083a4fa16",
+      "name": "Tech_Specialist_Tool"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "gpt-5.1"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        928,
+        1280
+      ],
+      "id": "8cf5fb1b-dff2-46a8-b59d-89621262e279",
+      "name": "OpenAI Model - Tech Agent",
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1056,
+        1344
+      ],
+      "id": "675bf782-b4cb-4af7-8585-b8cc5ea347fa",
+      "name": "Memory - Tech Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "name": "supportbot_technical_knowledge_tool",
+        "description": "Retrieve information from technical knowledgebase (Pinecone index: technical-index). Returns relevant Q&A chunks for password resets, API keys, bugs, integrations, mobile app, browser issues, 2FA, permissions, outages, backups.",
+        "topK": 3
+      },
+      "id": "c802543b-7d47-4cd6-8bc7-4bd22c5e629b",
+      "name": "Vector_Store_Tech",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "position": [
+        1392,
+        1328
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "technical-index",
+          "mode": "list",
+          "cachedResultName": "technical-index"
+        },
+        "options": {}
+      },
+      "id": "61e69893-3e36-4104-bf24-326cc7048c89",
+      "name": "Pinecone Vector Store (Retrieval)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        1344,
+        1472
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "ZC2Q1SGwuFzfc56Y",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        1616
+      ],
+      "id": "a9bb815c-525a-4e24-b1d1-82649003ebbc",
+      "name": "OpenAI Model - Vector Tool",
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1328,
+        1632
+      ],
+      "id": "b42d1e77-ab37-4fbd-bcf1-26caeea933ee",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "technical-index",
+          "mode": "list",
+          "cachedResultName": "technical-index"
+        },
+        "options": {}
+      },
+      "id": "fa97e4a9-9ced-49d6-bc82-4fe0e8648502",
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        1120,
+        -192
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "ZC2Q1SGwuFzfc56Y",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "binaryMode": "specificField",
+        "options": {}
+      },
+      "id": "c4dbf300-958e-4cc9-ad4a-d0377f2fe808",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        1280,
+        32
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 100,
+        "options": {}
+      },
+      "id": "15158586-b877-454f-8188-9c7eb9cb7513",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        1264,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {
+          "fileName": "={{ $json.name }}"
+        }
+      },
+      "id": "3c5eb36c-7318-4f92-a50f-696d1ddde062",
+      "name": "Download File From Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        912,
+        -192
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gEYlZdXeMeoJCwHl",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1eGzRtm28k-g7O5CqYJX7AiDz-HvQ2RKT",
+          "mode": "list",
+          "cachedResultName": "Technical",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1eGzRtm28k-g7O5CqYJX7AiDz-HvQ2RKT"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "id": "cc2f5461-11f5-4679-a8e7-41d26ab29f26",
+      "name": "Google Drive File Updated",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        576,
+        -48
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gEYlZdXeMeoJCwHl",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1eGzRtm28k-g7O5CqYJX7AiDz-HvQ2RKT",
+          "mode": "list",
+          "cachedResultName": "Technical",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1eGzRtm28k-g7O5CqYJX7AiDz-HvQ2RKT"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "9f73373a-dcf5-423b-a266-32eeaaab2afd",
+      "name": "Google Drive File Created",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        576,
+        -304
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gEYlZdXeMeoJCwHl",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "billing-index",
+          "mode": "list",
+          "cachedResultName": "billing-index"
+        },
+        "options": {}
+      },
+      "id": "4df7a5b7-50ad-4c06-9297-24ef6d4aa709",
+      "name": "Pinecone Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        2208,
+        -112
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "ZC2Q1SGwuFzfc56Y",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "binaryMode": "specificField",
+        "options": {}
+      },
+      "id": "82afd72d-c748-4860-b1fd-e36c9dd0f6cf",
+      "name": "Default Data Loader1",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        2368,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 100,
+        "options": {}
+      },
+      "id": "9fef52c9-c918-4aee-877c-40b30b94ee20",
+      "name": "Recursive Character Text Splitter1",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        2352,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {
+          "fileName": "={{ $json.name }}"
+        }
+      },
+      "id": "69892e15-3409-498b-8e75-dc3725e54fea",
+      "name": "Download File From Google Drive1",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        2000,
+        -112
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gEYlZdXeMeoJCwHl",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1PGbDy_reVXGAf-9BhvuJXgno1mbtZ23g",
+          "mode": "list",
+          "cachedResultName": "Billing",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1PGbDy_reVXGAf-9BhvuJXgno1mbtZ23g"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "id": "f90882a5-55dd-49a0-85dc-ae5d8831af57",
+      "name": "Google Drive File Updated1",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        1664,
+        32
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gEYlZdXeMeoJCwHl",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1PGbDy_reVXGAf-9BhvuJXgno1mbtZ23g",
+          "mode": "list",
+          "cachedResultName": "Billing",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1PGbDy_reVXGAf-9BhvuJXgno1mbtZ23g"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "7f3d0706-b567-4b96-a4a7-672314e9c15a",
+      "name": "Google Drive File Created1",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        1664,
+        -224
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gEYlZdXeMeoJCwHl",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2048,
+        144
+      ],
+      "id": "5b796e41-e40b-497d-8d4c-19c1d424796b",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        64
+      ],
+      "id": "2b48d176-eaf9-43f5-b1c6-d6869020e698",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "gpt-5.1"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1776,
+        1280
+      ],
+      "id": "fd43a184-12d6-4a14-b20b-1c2c5b17305a",
+      "name": "OpenAI Model - Tech Agent1",
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "billing-index",
+          "mode": "list",
+          "cachedResultName": "billing-index"
+        },
+        "options": {}
+      },
+      "id": "869706ee-8ca2-433d-88f4-fcfed06a1524",
+      "name": "Pinecone Vector Store (Retrieval)1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        2192,
+        1472
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "ZC2Q1SGwuFzfc56Y",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2368,
+        1680
+      ],
+      "id": "72601dc5-92f4-4144-8577-a3c9bd88f707",
+      "name": "OpenAI Model - Vector Tool1",
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2112,
+        1664
+      ],
+      "id": "3901e356-c1c5-4915-ad30-b9d6806ddc7b",
+      "name": "Embeddings OpenAI3",
+      "executeOnce": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Senior Billing Support Specialist. Use Vector_Store_Tech to search the knowledge base. If context is empty/unclear, use Create_Ticket. Keep responses under 50 words. Never hallucinate.",
+        "text": "={{ $json.query || $json.input || $('Telegram Trigger').item.json.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Senior Billing & Subscription Specialist for a SaaS product.\nYour goal is to answer pricing, payment, and policy questions accurately using the Knowledge Base.\n\n### ⚠️ MANDATORY FIRST STEP (NON-NEGOTIABLE)\n**ALWAYS use Vector_Store_Billing as your FIRST action when the user has a query.**\n- Do NOT answer from your own knowledge.\n- Do NOT skip the vector store lookup.\n- Do NOT guess or assume policy details.\n- Vector_Store_Billing MUST be called before any response or escalation.\n\nThis rule overrides all other instructions. If you skip this step, you are failing your core function.\n\n### AVAILABLE TOOLS\n1. Vector_Store_Billing: Search the billing knowledge base (Pinecone index: billing-index). Returns up to 3 relevant chunks with metadata (tags, policy_type, region, effective_date).\n2. Create_Ticket: Log a ticket in Airtable if you cannot answer confidently after checking the knowledge base.\n\n### CRITICAL RULES (FINANCIAL ACCURACY)\n1. NEVER hallucinate prices, discounts, refund amounts, or policy terms.\n2. If Vector_Store_Billing returns EMPTY, IRRELEVANT, or OUTDATED results → confidence = 0% → MUST use Create_Ticket.\n3. Always reference the currency (₱ PHP) correctly.\n4. For VAT questions, explicitly state if prices are inclusive or exclusive of tax (per retrieved policy).\n5. If a user asks for a refund, check the \"Refund Policy\" in the retrieved context before responding.\n6. If multiple policies exist (e.g., old vs. new pricing), prioritize the most recent effective_date from metadata.\n\n### DECISION PROCESS (STRICT ORDER)\n1. **MANDATORY**: Call Vector_Store_Billing with the user's query. Wait for results.\n2. Evaluate the retrieved context:\n   - If context is EMPTY, IRRELEVANT, CONTRADICTORY, or references deprecated policies → confidence = 0% → MUST use Create_Ticket.\n   - If context is PARTIAL or AMBIGUOUS → confidence < 80% → MUST use Create_Ticket.\n   - ONLY if context provides a CLEAR, COMPLETE, CURRENT, and UNAMBIGUOUS policy → respond directly.\n3. When responding directly:\n   - Keep responses under 50 words.\n   - Be professional, precise, and cite the policy source if relevant (e.g., \"Per our Refund Policy...\").\n   - If VIP: Acknowledge status and offer priority billing support.\n4. When creating a ticket:\n   - Use Create_Ticket tool (no extra parameters needed).\n   - Tell the user: \"I've logged your billing inquiry and our finance team will respond within 15 minutes.\"\n\n### USER CONTEXT\n- Query: \"{{ $('Telegram Trigger').item.json.message.text }}\" (passed from Orchestrator)\n- Customer Status: \"{{ $('Merge').item.json.Status }}\" (VIP/Standard/Trial)\n\n### CONFIDENCE CHECKLIST\n✅ Answer directly ONLY if:\n   - Vector_Store_Billing was called (mandatory)\n   - Retrieved 1-3 highly relevant chunks\n   - Chunks contain a complete, unambiguous, current policy\n   - No conflicting information across chunks\n❌ Create ticket if:\n   - Vector_Store_Billing returned 0 chunks\n   - Chunks are tangential, incomplete, outdated, or contradictory\n   - User question requires account-specific data not in KB\n   - You are <80% confident in the answer\n\n### TONE GUIDELINES\n- Standard users: Professional, concise, precise\n- VIP users: Acknowledge priority, offer direct escalation path\n- Angry users: Empathetic first (\"I understand this is important\"), then solution-focused\n\n### OUTPUT FORMAT\n- If answering: Return the precise policy answer (plain text, no markdown, under 50 words).\n- If escalating: Return the exact acknowledgment message above.\n- NEVER include tool call metadata, confidence scores, or internal reasoning in the final output.\n\n### REMINDER\n🔁 **Vector_Store_Billing is ALWAYS your first step. No exceptions.**",
+          "maxIterations": 3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        1904,
+        1184
+      ],
+      "id": "9d51882e-fed8-4526-b142-18da39004f74",
+      "name": "Billing_Specialist_Tool"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a Support Intent Classifier for a Telegram bot.\nYour ONLY job is to analyze the user's message and extract four fields: Intent, Sentiment, Action_Taken, and escalation_reason.\n\n### EXTRACTION RULES\n\n**Intent** (choose ONE):\n- \"Tech_Support\": Password resets, API keys, bugs, errors, integrations, mobile app, browser issues, data export, 2FA, permissions, outages, backups.\n- \"Billing\": Pricing, refunds, invoices, payment methods, plan changes, VAT, cancellations, discounts, proration.\n- \"General\": Greetings, thanks, unclear questions, non-specific inquiries.\n- \"Complaint\": Angry messages, legal threats, service criticisms, escalation requests.\n\n**Sentiment** (choose ONE):\n- \"Positive\": Thankful, praising, satisfied, polite enthusiasm.\n- \"Neutral\": Factual, calm, informational, no strong emotion.\n- \"Angry\": Frustrated, demanding, caps lock, exclamation marks, negative words.\n\n**Action_Taken** (choose ONE based on routing logic):\n- \"Auto_Reply\": Query can be answered by specialist agent from knowledge base (standard user + neutral/positive sentiment + clear intent).\n- \"Human_Escalation\": User is VIP OR sentiment is Angry OR intent is Complaint OR query is complex/unclear.\n\n**escalation_reason** (choose ONE - MUST match Airtable options exactly):\n- \"Angry\": Sentiment=\"Angry\" (regardless of Status)\n- \"VIP\": Status=\"VIP\" AND Sentiment≠\"Angry\"\n- \"Complaint\": Intent=\"Complaint\" AND Sentiment≠\"Angry\" AND Status≠\"VIP\"\n- \"Low Confidence\": All other cases requiring escalation\n\n### INPUT\nUser Message: \"{{ $('Telegram Trigger').item.json.message.text }}\"\nUser Status: \"{{ $json.Status }}\" (VIP/Standard/Trial)\n\n### OUTPUT FORMAT\nReturn ONLY valid JSON matching this exact schema. No markdown, no extra text, no explanations.\n\n{\n  \"Intent\": \"Tech_Support\" | \"Billing\" | \"General\" | \"Complaint\",\n  \"Sentiment\": \"Positive\" | \"Neutral\" | \"Angry\",\n  \"Action_Taken\": \"Auto_Reply\" | \"Human_Escalation\",\n  \"escalation_reason\": \"Angry\" | \"VIP\" | \"VIP user\" | \"Complaint\" | \"Low Confidence\"\n}\n\n### EXAMPLES\n\nInput: {\"message\": \"I want a refund NOW!!!\", \"Status\": \"VIP\"}\nOutput: {\"Intent\": \"Billing\", \"Sentiment\": \"Angry\", \"Action_Taken\": \"Human_Escalation\", \"escalation_reason\": \"Angry\"}\n\nInput: {\"message\": \"I need priority support\", \"Status\": \"VIP\"}\nOutput: {\"Intent\": \"General\", \"Sentiment\": \"Neutral\", \"Action_Taken\": \"Human_Escalation\", \"escalation_reason\": \"VIP\"}\n\nInput: {\"message\": \"Your refund policy is unclear\", \"Status\": \"Standard\"}\nOutput: {\"Intent\": \"Complaint\", \"Sentiment\": \"Neutral\", \"Action_Taken\": \"Human_Escalation\", \"escalation_reason\": \"Complaint\"}\n\nInput: {\"message\": \"What does this button do?\", \"Status\": \"Standard\"}\nOutput: {\"Intent\": \"General\", \"Sentiment\": \"Neutral\", \"Action_Taken\": \"Human_Escalation\", \"escalation_reason\": \"Low Confidence\"}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1808,
+        640
+      ],
+      "id": "46c7fe7c-8b38-4b43-a378-72b8c8360619",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-nano"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1744,
+        832
+      ],
+      "id": "1fe8c819-a0f6-49fe-8c96-670cee0a388c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"Intent\": \"Tech_Support\",\n  \"Sentiment\": \"Neutral\", \n  \"Action_Taken\": \"Auto_Reply\",\n  \"Escalation_Reason\": \"VIP\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1904,
+        848
+      ],
+      "id": "f00ba3b2-eee3-43cd-a878-aeb846024eab",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "name": "supportbot_billing_knowledge_tool",
+        "description": "Retrieve information from billing knowledgebase (Pinecone index: technical-index). Returns relevant Q&A chunks for Pricing, plans, subscription, refund policy,  cancellation, invoice, receipt, payment, tax, vat, discount, promo, proration.\n",
+        "topK": 5
+      },
+      "id": "25edf2f9-9c9c-4cd9-8000-d9f46662e4ea",
+      "name": "Vector_Store_Billing",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "position": [
+        2128,
+        1312
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1488,
+        704
+      ],
+      "id": "474acc93-a652-4f03-be5e-783d3003159d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Human Escalation Handler. Handles angry users, VIPs, complaints, and low-confidence queries. Calls Create_Escalation_Ticket and Notify_Human_Team workflows.",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=┌─────────────────────────────────────────────────────────────────────────────┐\n│  ROLE: Crisis & VIP Support Manager                                         │\n│  MISSION: De-escalate users, log tickets to Airtable, notify human support  │\n│  CONSTRAINT: Each tool must be called EXACTLY ONCE per user message         │\n└─────────────────────────────────────────────────────────────────────────────┘\n\n═══════════════════════════════════════════════════════════════════════════════\n⚠️ MANDATORY ACTIONS (NON-NEGOTIABLE - EXECUTE IN ORDER)\n═══════════════════════════════════════════════════════════════════════════════\n\n1. ✅ CALL Create_Log_Record ONCE → Log escalation to Airtable\n2. ✅ CALL Notify_Human_Team ONCE → Send email alert to human support\n3. ✅ RETURN user response ONCE → Calming, empathetic acknowledgment\n\n❌ NEVER skip any step\n❌ NEVER call any tool more than once\n❌ NEVER proceed to next step until current tool returns successful response\n\n═══════════════════════════════════════════════════════════════════════════════\n🛡️ AVAILABLE TOOLS (AUTHORIZED ONLY - NO EXCEPTIONS)\n═══════════════════════════════════════════════════════════════════════════════\n\n┌─────────────────────┬────────────────────────────────────────────────────────┐\n│ Tool                │ Purpose & Constraints                                  │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ Create_Log_Record   │ Creates Airtable ticket. Call FIRST. Call ONCE.        │\n│                     │ Returns: { ticket_created, ticket_id, email_status }   │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ Notify_Human_Team   │ Sends email to kevynalojepan01@gmail.com. Call SECOND. │\n│                     │ Call ONCE. Returns: { notified, email_status }         │\n└─────────────────────┴────────────────────────────────────────────────────────┘\n\n⛔ UNAUTHORIZED TOOLS (DO NOT ATTEMPT):\n   - Slack_Alert, SMS_Notification, PagerDuty, Webhook, HTTP_Request\n   - Any tool not explicitly listed above will cause system failure\n\n═══════════════════════════════════════════════════════════════════════════════\n📥 USER CONTEXT (INJECT THESE VALUES - NO MODIFICATION)\n═══════════════════════════════════════════════════════════════════════════════\n\n┌─────────────────────┬────────────────────────────────────────────────────────┐\n│ Field               │ Source Expression                                      │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ query               │ {{ $('Telegram Trigger').item.json.message.text }}     │\n│ user_id             │ {{ $('Telegram Trigger').item.json.message.chat.id }}  │\n│ intent              │ {{ $json.output.Intent }}                              │\n│ sentiment           │ {{ $json.output.Sentiment }}                           │\n│ status              │ {{ $('Merge').item.json.Status }}                      │\n│ escalation_reason   │ {{ $json.output.Escalation_Reason }}                   │\n└─────────────────────┴────────────────────────────────────────────────────────┘\n\n⚠️ DATA INTEGRITY RULES:\n   - Use EXACT values from context above\n   - NEVER fabricate, hallucinate, or substitute placeholder values\n   - NEVER use: \"VIP-USER-001\", \"test message\", \"user123\", etc.\n\n═══════════════════════════════════════════════════════════════════════════════\n🔧 TOOL CALL PAYLOADS (COPY EXACTLY - NO DEVIATIONS)\n═══════════════════════════════════════════════════════════════════════════════\n\n▼ Create_Log_Record Payload:\n┌─────────────────────────────────────────────────────────────────────────────┐\n│ {                                                                           │\n│   \"query\": \"{{ $('Telegram Trigger').item.json.message.text }}\",            │\n│   \"user_id\": \"{{ $('Telegram Trigger').item.json.message.chat.id }}\",       │ \n│   \"intent\": \"{{ $json.output.Intent }}\",                                    │\n│   \"sentiment\": \"{{ $json.output.Sentiment }}\",                              │\n│   \"status\": \"{{ $('Merge').item.json.Status }}\",                           \n│   \"escalation_reason\": \"{{ $json.output.Escalation_Reason }}\"               │\n│ }                                                                           │\n└─────────────────────────────────────────────────────────────────────────────┘\n\n▼ Notify_Human_Team Payload:\n┌─────────────────────────────────────────────────────────────────────────────┐\n│ { }  ← EMPTY PAYLOAD                                                        │\n│                                                                             │\n│ Note: This tool reads directly from workflow context. No input needed.      │\n│       Just call the tool - it will automatically access:                    │\n│       - User_ID, Status, Intent, Sentiment, Message from context            │\n└─────────────────────────────────────────────────────────────────────────────┘\n\n═══════════════════════════════════════════════════════════════════════════════\n🔄 EXECUTION FLOW (STRICT SEQUENCE - NO DEVIATIONS)\n═══════════════════════════════════════════════════════════════════════════════\n\nStep 1 ──► CALL Create_Log_Record (EXACTLY ONCE)\n           │\n           ├─► WAIT for response: { ticket_created, ticket_id, ... }\n           │\n           ├─► IF success → PROCEED to Step 2\n           │\n           └─► IF error → LOG internally, PROCEED to Step 2 anyway\n           \nStep 2 ──► CALL Notify_Human_Team (EXACTLY ONCE)\n           │\n           ├─► NO PAYLOAD REQUIRED - reads from workflow context\n           │\n           ├─► WAIT for response: { notified, email_status }\n           │\n           ├─► IF success → PROCEED to Step 3\n           │\n           └─► IF error → LOG internally, PROCEED to Step 3 anyway\n           \nStep 3 ──► GENERATE user-facing response (EXACTLY ONCE)\n           │\n           ├─► Use appropriate template based on sentiment/status\n           │\n           └─► RETURN JSON output and STOP\n\n🛑 STOP CONDITIONS (TRIGGER IMMEDIATE HALT):\n   - After Step 3 completes, DO NOT execute any further actions\n   - DO NOT loop back to Step 1 or Step 2\n   - DO NOT call any tool again in this session\n\n═══════════════════════════════════════════════════════════════════════════════\n💬 RESPONSE TEMPLATES (ADAPT CONTEXTUALLY - KEEP UNDER 60 WORDS)\n═══════════════════════════════════════════════════════════════════════════════\n\n▼ Angry User (sentiment = \"Angry\"):\n\"I understand this is frustrating, and I'm sorry you're experiencing this. \nI've logged your concern and our senior support team will message you within \n10 minutes. Is there anything else I can help with right now?\"\n\n▼ VIP User (status = \"VIP\"):\n\"Thank you for reaching out. As a valued VIP member, I've prioritized your \ninquiry and our dedicated support specialist will contact you within 10 minutes.\"\n\n▼ Standard Escalation (all other cases):\n\"I want to make sure you get the most accurate answer. I've logged your \nquestion and our specialist will follow up within 10 minutes.\"\n\n═══════════════════════════════════════════════════════════════════════════════\n📤 OUTPUT FORMAT (STRICT JSON SCHEMA - NO DEVIATIONS)\n═══════════════════════════════════════════════════════════════════════════════\n\nReturn ONLY this JSON structure. No markdown. No explanations. No extra fields.\n\n┌─────────────────────────────────────────────────────────────────────────────┐\n│ {                                                                           │\n│   \"response\": \"string (plain text, under 60 words)\",                        │\n│   \"ticket_created\": boolean (must be true),                                 │\n│   \"email_sent\": boolean (true if email succeeded, false if failed)          │\n│ }                                                                           │\n└─────────────────────────────────────────────────────────────────────────────┘\n\n═══════════════════════════════════════════════════════════════════════════════\n🛡️ CRITICAL GUARDRAILS (VIOLATION = SYSTEM FAILURE)\n═══════════════════════════════════════════════════════════════════════════════\n\n✅ DO:\n   - Call Create_Log_Record EXACTLY ONCE\n   - Call Notify_Human_Team EXACTLY ONCE\n   - Use actual values from USER CONTEXT section\n   - Wait for each tool response before proceeding\n   - Return response even if email fails (graceful degradation)\n   - Keep user response under 60 words, plain text\n\n❌ DO NOT:\n   - Call any tool more than once per message\n   - Call unauthorized tools (Slack, SMS, Webhook, etc.)\n   - Use placeholder/fabricated values\n   - Include tool call details in user-facing response\n   - Promise specific resolutions (only promise follow-up)\n   - Attempt to set Priority (Airtable AI field handles it)\n   - Retry failed tools more than once\n\n═══════════════════════════════════════════════════════════════════════════════\n🔍 SELF-VALIDATION CHECKLIST (EXECUTE BEFORE RETURNING OUTPUT)\n═══════════════════════════════════════════════════════════════════════════════\n\nBefore returning your final output, verify ALL conditions are met:\n\n□ Did I call Create_Log_Record EXACTLY ONCE?\n□ Did I call Notify_Human_Team EXACTLY ONCE?\n□ Did I use actual values from USER CONTEXT (no placeholders)?\n□ Did I STOP after both tools completed (no extra calls)?\n□ Is my response under 60 words and plain text?\n□ Is my output valid JSON matching the schema above?\n□ Did I avoid setting Priority manually (Airtable handles it)?\n\nIf ANY box is unchecked → DO NOT return output. Fix the issue first.\n\n═══════════════════════════════════════════════════════════════════════════════\n🧠 CHAIN OF THOUGHT (INTERNAL REASONING - DO NOT OUTPUT)\n═══════════════════════════════════════════════════════════════════════════════\n\nThink through this sequence internally before acting:\n\n1. \"What tools am I authorized to use?\" → Create_Log_Record, Notify_Human_Team\n2. \"What is the correct order?\" → Create_Log_Record FIRST, then Notify_Human_Team\n3. \"Have I called each tool once?\" → Track internally, stop after one call each\n4. \"Do I have all required values from context?\" → Verify before each tool call\n5. \"Is my output valid JSON?\" → Validate against schema before returning\n\n═══════════════════════════════════════════════════════════════════════════════\n⚡ FINAL REMINDER (READ BEFORE EVERY EXECUTION)\n═══════════════════════════════════════════════════════════════════════════════\n\n🔁 Create_Log_Record = ONCE\n🔁 Notify_Human_Team = ONCE\n🔁 User Response = ONCE\n🔁 Total Tool Calls = 2 (NO MORE, NO LESS)\n🔁 Stop Immediately After Step 3 Completes\n\nIf you deviate from this protocol, you are failing your core function.",
+          "maxIterations": 4,
+          "returnIntermediateSteps": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        2912,
+        1200
+      ],
+      "id": "58bfa662-8586-451f-a96e-b0a2f3606bbf",
+      "name": "Escalation_Handler_Tool"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "gpt-5.1"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2832,
+        1408
+      ],
+      "id": "16f4a784-8b63-4731-9e59-abdefee1accd",
+      "name": "OpenAI Chat Model1",
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "1ScqNBJ1UQ7e4wnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 2
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1888,
+        1360
+      ],
+      "id": "b982595b-de5c-4e02-b928-ccfd76201138",
+      "name": "Memory - Billing Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 1
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2992,
+        1392
+      ],
+      "id": "86f62a6d-bf27-432d-b816-08bc6647c321",
+      "name": "Memory - Escalation Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a record in Airtable",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfXBOMlLnflHjoS",
+          "mode": "list",
+          "cachedResultName": "Support Orchestrator",
+          "cachedResultUrl": "https://airtable.com/appfXBOMlLnflHjoS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1Gm140sCCEjySC",
+          "mode": "list",
+          "cachedResultName": "Ticket_Logs",
+          "cachedResultUrl": "https://airtable.com/appfXBOMlLnflHjoS/tbl1Gm140sCCEjySC"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Follow Up Sent": false,
+            "Timestamp": "={{ $now }}",
+            "User_ID": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "Message": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "Intent": "={{ $json.output.Intent }}",
+            "Sentiment": "={{ $json.output.Sentiment }}",
+            "Escalation Reason": "={{ $json.output.Escalation_Reason }}",
+            "Status": "In Progress",
+            "Email Status": "Pending",
+            "Resolution": "\"Escalated to human support team via email\"",
+            "Ticket_ID": "=={{ 'ESC-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000 + Math.random() * 9000) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "User_ID",
+              "displayName": "User_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resolution",
+              "displayName": "Resolution",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Intent",
+              "displayName": "Intent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Complaint",
+                  "value": "Complaint"
+                },
+                {
+                  "name": "Tech_Support",
+                  "value": "Tech_Support"
+                },
+                {
+                  "name": "Billing",
+                  "value": "Billing"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Angry",
+                  "value": "Angry"
+                },
+                {
+                  "name": "Neutral",
+                  "value": "Neutral"
+                },
+                {
+                  "name": "Positive",
+                  "value": "Positive"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Critical",
+                  "value": "Critical"
+                },
+                {
+                  "name": "High",
+                  "value": "High"
+                },
+                {
+                  "name": "Medium",
+                  "value": "Medium"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Escalation Reason",
+              "displayName": "Escalation Reason",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Angry",
+                  "value": "Angry"
+                },
+                {
+                  "name": "VIP",
+                  "value": "VIP"
+                },
+                {
+                  "name": "Complaint",
+                  "value": "Complaint"
+                },
+                {
+                  "name": "Low Confidence",
+                  "value": "Low Confidence"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Resolved",
+                  "value": "Resolved"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "Sent",
+                  "value": "Sent"
+                },
+                {
+                  "name": "Failed",
+                  "value": "Failed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ticket_ID",
+              "displayName": "Ticket_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Follow Up Sent",
+              "displayName": "Follow Up Sent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        3280,
+        1392
+      ],
+      "id": "ba487019-ce1f-4a66-a33e-9ec222481038",
+      "name": "Create_Log_Record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Mnvk8UrRTmHbH741",
+          "name": "Support"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "kevynalojepan01@gmail.com",
+        "subject": "Urgent Escalation",
+        "emailType": "text",
+        "message": "={{ `User_ID: ${$('Telegram Trigger').item.json.message.chat.id}\\nStatus: ${$('Merge').item.json.Status}\\nIntent: ${$json.output.Intent}\\nSentiment: ${$json.output.Sentiment}\\nMessage: ${$('Telegram Trigger').item.json.message.text}` }}\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        3104,
+        1600
+      ],
+      "id": "034b7c2f-244f-4b9f-b5fb-dfa619e1426a",
+      "name": "Notify_Human_Team",
+      "webhookId": "3410a0f9-b8c1-457e-a935-ee5f266c1a1b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pTh3WpmmbnUgRzKC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"response\": \"To reset your password, go to Settings > Security > Reset Password. Enter your email and follow the link sent to you.\",\n  \"confidence\": \"high\",\n  \"action_taken\": \"answered\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1200,
+        1424
+      ],
+      "id": "a07a7c89-14aa-4d94-a226-e4b2c14cdb2f",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"response\": \"The Pro plan costs $29/month or $290/year. You can upgrade anytime from Settings > Billing > Change Plan.\",\n  \"confidence\": \"high\",\n  \"action_taken\": \"answered\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1968,
+        1584
+      ],
+      "id": "7218feca-613c-4c1e-8a8d-41d76444e7a8",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"response\": \"I understand this is frustrating. I've logged your concern and our senior support team will message you within 10 minutes.\",\n  \"ticket_created\": true,\n  \"email_sent\": true\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3120,
+        1392
+      ],
+      "id": "746eb087-7824-4099-85f6-f7913f53dfb8",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"response\": \"I understand this is frustrating. I've logged your concern and our senior support team will message you within 10 minutes.\",\n  \"tool_called\": \"Escalation_Handler_Tool\",\n  \"tool_executed\": true\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2928,
+        848
+      ],
+      "id": "6659399f-bba5-42b2-bd56-9da0fabfc1b6",
+      "name": "Structured Output Parser4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Customers": {
+      "main": [
+        [
+          {
+            "node": "If User Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If User Exists": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create New Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Customer": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Manager": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Manager",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory - Manager": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Manager",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Manager": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Tech Agent": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Tech_Specialist_Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory - Tech Agent": {
+      "ai_memory": [
+        [
+          {
+            "node": "Tech_Specialist_Tool",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store (Retrieval)": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector_Store_Tech",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Vector Tool": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Vector_Store_Tech",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store (Retrieval)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector_Store_Tech": {
+      "ai_tool": [
+        [
+          {
+            "node": "Tech_Specialist_Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tech_Specialist_Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File From Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive File Updated": {
+      "main": [
+        [
+          {
+            "node": "Download File From Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive File Created": {
+      "main": [
+        [
+          {
+            "node": "Download File From Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File From Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive File Updated1": {
+      "main": [
+        [
+          {
+            "node": "Download File From Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive File Created1": {
+      "main": [
+        [
+          {
+            "node": "Download File From Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Tech Agent1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Billing_Specialist_Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store (Retrieval)1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector_Store_Billing",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Vector Tool1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Vector_Store_Billing",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store (Retrieval)1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Billing_Specialist_Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "AI Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector_Store_Billing": {
+      "ai_tool": [
+        [
+          {
+            "node": "Billing_Specialist_Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation_Handler_Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Escalation_Handler_Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory - Billing Agent": {
+      "ai_memory": [
+        [
+          {
+            "node": "Billing_Specialist_Tool",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory - Escalation Agent": {
+      "ai_memory": [
+        [
+          {
+            "node": "Escalation_Handler_Tool",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create_Log_Record": {
+      "ai_tool": [
+        [
+          {
+            "node": "Escalation_Handler_Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify_Human_Team": {
+      "ai_tool": [
+        [
+          {
+            "node": "Escalation_Handler_Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Tech_Specialist_Tool",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Billing_Specialist_Tool",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Escalation_Handler_Tool",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Manager",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Manila",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "b9e33cd0-49c5-4d04-a910-ed96de16fae2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b8ba6d5ece6ebb4b96932a2497c0386e54d7063dc5021afc12852fda47bd65e9"
+  },
+  "id": "RL5rMxI0da5QV3p5",
+  "tags": []
+}
